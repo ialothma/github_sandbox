@@ -139,10 +139,13 @@ def getIntList(spark_input):
 
     device_list = getDevList()
 
+    user_input = spark_input
+    user_input= user_input.lstrip()
+
     id = ""
     device_id_idx = 5
-    if int(spark_input) in range(1,len(device_list)+1): # Check if input is within range
-        id = device_list[int(spark_input)-1][device_id_idx]
+    if int(user_input) in range(1,len(device_list)+1): # Check if input is within range
+        id = device_list[int(user_input)-1][device_id_idx]
     else:
         print ("Oops! number is out of range, please try again or enter 'exit'")
 

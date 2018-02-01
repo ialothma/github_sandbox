@@ -55,13 +55,13 @@ def index(request):
         elif 'device config' in in_message:
             in_message = in_message.replace('device config', '')
             if int(in_message) in range(1,len(device_list)+1):
-                msg = controller.getDevConf(int(in_message))
+                msg = controller.getDevConf(in_message)
             else:
                 msg = "invalid number, please choose a number from the list, use the `device list` command to display the list"
         elif 'device interfaces' in in_message:
             in_message = in_message.replace('device interfaces', '')
             if int(in_message) in range(1,len(device_list)+1):
-                msg = controller.getDevConf(int(in_message))
+                msg = controller.getIntList(in_message)
             else:
                 msg = "invalid number, please choose a number from the list, use the `device list` command to display the list"
         else:
