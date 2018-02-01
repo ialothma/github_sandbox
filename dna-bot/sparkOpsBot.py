@@ -48,14 +48,32 @@ def index(request):
         in_message = result.get('text', '').lower()
         in_message = in_message.replace(bot_name, '')
 
-        if 'device list' in in_message:
+        if 'get users':
+            msg = controller.getUser()
+        elif 'device list' in in_message:
             msg = controller.getDevTable()
         elif 'device config' in in_message:
-            message = result.get('text').split('batcave')[1].strip(" ")
+            in_message = in_message.replace('device config', '')
+            if int(in_message) in range(1,len(device_list)+1):
+                msg = controller.getDevConf(int(in_message))
+            else:
+                msg = "invalid number, please choose a number from the list, use the `device list` command to display the list"
+        elif 'device interfaces' in in_message:
+            in_message = in_message.replace('device interfaces', '')
+            if int(in_message) in range(1,len(device_list)+1):
+                msg = controller.getDevConf(int(in_message))
+            else:
+                msg = "invalid number, please choose a number from the list, use the `device list` command to display the list"
+        else:
+            msg = """
+            Command List:\n
+            - `get users`
+            - `device list`
+            - `device config (device number from list)`
+            - `device interfaces (device number from list)`"""
 
-        elif 'batsignal' in in_message:
-            print "NANA NANA NANA NANA"
-            sendSparkPOST("https://api.ciscospark.com/v1/messages", {"roomId": webhook['data']['roomId'], "files": bat_signal})
+
+        #send message to room
         if msg != None:
             print msg
             sendSparkPOST("https://api.ciscospark.com/v1/messages", {"roomId": webhook['data']['roomId'], "text": msg})
