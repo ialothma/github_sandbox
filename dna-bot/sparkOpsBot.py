@@ -47,41 +47,54 @@ def index(request):
     if webhook['data']['personEmail'] != bot_email:
         in_message = result.get('text', '').lower()
         in_message = in_message.replace(bot_name, '')
-
-        if 'get users':
+	device_list= controller.getDevList()
+        if 'get users' in in_message:
             msg = controller.getUser()
         elif 'device list' in in_message:
             msg = controller.getDevTable()
         elif 'device config' in in_message:
             in_message = in_message.replace('device config', '')
-            if int(in_message) in range(1,len(device_list)+1):
+	    in_message = in_message.replace(' ','')    
+	    if in_message == '':
+		msg = "Please specify device number."
+            elif int(in_message) in range(1,len(device_list)+1):
                 msg = controller.getDevConf(in_message)
             else:
                 msg = "invalid number, please choose a number from the list, use the `device list` command to display the list"
         elif 'device interfaces' in in_message:
             in_message = in_message.replace('device interfaces', '')
-            if int(in_message) in range(1,len(device_list)+1):
+            in_message = in_message.replace(' ','') 
+            if in_message == '':
+                msg = "Please specify device number."
+            elif int(in_message) in range(1,len(device_list)+1):
                 msg = controller.getIntList(in_message)
+		msg = msg.split('<split>',1)
             else:
                 msg = "invalid number, please choose a number from the list, use the `device list` command to display the list"
         else:
-            msg = """
-            Command List:\n
-            - `get users`
-            - `device list`
-            - `device config (device number from list)`
-            - `device interfaces (device number from list)`"""
+            msg = "\
+            Command List: <br>\
+            - **get users** <br>\
+            - **device list** <br>\
+            - **device config** (device number from list) <br>\
+            - **device interfaces** (device number from list) "
 
 
         #send message to room
         if msg != None:
             print msg
-            sendSparkPOST("https://api.ciscospark.com/v1/messages", {"roomId": webhook['data']['roomId'], "text": msg})
+	    if isinstance(msg, list):
+	    	for message in msg:
+			message = "%s"%message
+			sendSparkPOST("https://api.ciscospark.com/v1/messages", {"roomId": webhook['data']['roomId'], "markdown": message})
+            else:
+		sendSparkPOST("https://api.ciscospark.com/v1/messages", {"roomId": webhook['data']['roomId'], "markdown": msg})
+
     return "true"
 
 ####CHANGE THESE VALUES#####
-bot_email = "testbot1x@sparkbot.io"
-bot_name = "TestBot"
-bearer = "8d16e9.08e16cc95617d037"
+bot_email = "ozgebot@sparkbot.io"
+bot_name = "DNA Manager Bot"
+bearer = "ZGQ5ZTA0MGEtNGUwZS00ZWYzLTk1MWUtOTY2M2Y1ZmU4ODdhMTJkYTY4MjEtYzEz"
 #bat_signal  = "https://upload.wikimedia.org/wikipedia/en/c/c6/Bat-signal_1989_film.jpg"
 run_itty(server='wsgiref', host='0.0.0.0', port=10010)

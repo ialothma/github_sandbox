@@ -24,7 +24,7 @@ def getUser():
     for item in response_json["response"]:
         output += "<h3>User \'%s\'</h3><br>role(s): "%(item["username"])
         for item1 in item["authorization"]:
-            output += "%s, "%((item1["role"])[5:])
+            output += "`%s` "%((item1["role"])[5:])
         output += "<br>"
 
     return output
@@ -75,9 +75,9 @@ def getDevTable():
 
 
     output1 = """<pre><code class="language-none">
-    ========  =============================  =============  =============  ==============================================\n
-    number            hostname                    ip            Serial      type                                         \n
-    ========  =============================  =============  =============  ==============================================\n"""
+========  =============================  =============  =============  ==============================================\n
+ number            hostname                   ip            Serial                        type                       \n
+========  =============================  =============  =============  ==============================================\n"""
 
 
 
@@ -88,9 +88,9 @@ def getDevTable():
 
         output1 = output1 + "%s %s" % (item1[2],' '*(ip_offset+2-len(item1[2]))) #add ip
 
-        output1 = output1 + "%s %s" % (item1[3],' '*(serialNo_offset+2-len(item1[3]))) #add serial number
+        output1 = output1 + "%s %s" % (item1[4],' '*(serialNo_offset+2-len(item1[4]))) #add serial number
 
-        output1 = output1 + "%s %s\n" % (item1[4],' '*(type_offset-len(item1[4]))) #add type
+        output1 = output1 + "%s %s\n" % (item1[3],' '*(type_offset-len(item1[3]))) #add type
 
 
     output1 = output1 + """========  =============================  =============  =============  ==============================================\n</pre></code>"""
@@ -148,7 +148,8 @@ def getIntList(spark_input):
         id = device_list[int(user_input)-1][device_id_idx]
     else:
         print ("Oops! number is out of range, please try again or enter 'exit'")
-
+    
+    selected_api = "interface/network-device/id"
 
     # GET api request
     try:
@@ -161,20 +162,20 @@ def getIntList(spark_input):
     try:
         response_json = resp.json()
         print ("Response:\n",json.dumps(response_json,indent = 4))
-        output ='''
-                <h1>%s</h1>
-                <br>
-                <p>Serial#: %s</p>
-                <br>
-                '''%(n["serialNo"],n["series"])
+        output ="""\
+                <h1>%s</h1><br>\
+                <p>Serial#: %s</p><br>\
+                """%(device_list[int(user_input)-1][3],device_list[int(user_input)-1][4])
         for n in response_json["response"]:
-            output +='''
-                     <h3>Port %s</h3><br>
-                     <h5>- MAC address: %s</h5><br>
-                     <h5>- Status: %s</h5><br>
-                     <h5>- Vlan: %s</h5><br>
-                     <br>
-                     '''%(n["portName"],n["macAddress"],n["status"],n["vlanId"])
+            output +="""\
+                     <h3>Port %s</h3>\
+                     <h5>- MAC address: %s</h5>\
+                     <h5>- Status: %s</h5>\
+                     <h5>- Vlan: %s</h5><br>\
+                     """%(n["portName"],n["macAddress"],n["status"],n["vlanId"])
+	    if len(output) > 8500:
+		output += "<split>"
+	print output
         return output
     except:
         if status == 204:
